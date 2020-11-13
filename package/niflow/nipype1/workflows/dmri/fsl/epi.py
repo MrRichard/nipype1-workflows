@@ -404,11 +404,11 @@ def fieldmap_correction(name='fieldmap_correction', nocheck=False):
                     (('te_diff', _ms2sec), 'asym_se_time'),
                     ('vsm_sigma', 'smooth2d'), (('epi_echospacing', _ms2sec),
                                                 'dwell_time')]),
-         (mask_mag, vsm, [('out_file', 'mask_file')]), (inputnode, dwi_split, [
+         (inputnode, vsm, [('in_mask', 'mask_file')]), (inputnode, dwi_split, [
              ('in_file', 'in_file')
          ]), (dwi_split, dwi_applyxfm,
-              [('out_files', 'in_file')]), (mask_mag, dwi_applyxfm,
-                                            [('out_file', 'mask_file')]),
+               [('out_files', 'in_file')]), (inputnode, dwi_applyxfm,
+                                            [('in_mask', 'mask_file')]),
          (vsm, dwi_applyxfm,
           [('shift_out_file', 'shift_in_file')]), (inputnode, dwi_applyxfm, [
               ('encoding_direction', 'unwarp_direction')
