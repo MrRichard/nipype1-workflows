@@ -18,20 +18,14 @@ def create_dmri_preprocessing(name='dMRI_preprocessing',
     Creates a workflow that chains the necessary pipelines to
     correct for motion, eddy currents, and, if selected, susceptibility
     artifacts in EPI dMRI sequences.
-
     .. deprecated:: 0.9.3
       Use :func:`nipype.workflows.dmri.preprocess.epi.all_fmb_pipeline` or
       :func:`nipype.workflows.dmri.preprocess.epi.all_peb_pipeline` instead.
-
-
     .. warning:: This workflow rotates the b-vectors, so please be
       advised that not all the dicom converters ensure the consistency between the resulting
       nifti orientation and the b matrix table (e.g. dcm2nii checks it).
-
-
     Example
     -------
-
     >>> nipype_dmri_preprocess = create_dmri_preprocessing('nipype_dmri_prep')
     >>> nipype_dmri_preprocess.inputs.inputnode.in_file = 'diffusion.nii'
     >>> nipype_dmri_preprocess.inputs.inputnode.in_bvec = 'diffusion.bvec'
@@ -43,10 +37,7 @@ def create_dmri_preprocessing(name='dMRI_preprocessing',
     >>> nipype_dmri_preprocess.inputs.inputnode.epi_rev_encoding = False
     >>> nipype_dmri_preprocess.inputs.inputnode.pi_accel_factor = True
     >>> nipype_dmri_preprocess.run() # doctest: +SKIP
-
-
     Inputs::
-
         inputnode.in_file - The diffusion data
         inputnode.in_bvec - The b-matrix file, in FSL format and consistent with the in_file orientation
         inputnode.ref_num - The reference volume (a b=0 volume in dMRI)
@@ -57,20 +48,12 @@ def create_dmri_preprocessing(name='dMRI_preprocessing',
         inputnode.epi_rev_encoding - True if reverse encoding was used (generally False)
         inputnode.pi_accel_factor - Parallel imaging factor (aka GRAPPA acceleration factor)
         inputnode.vsm_sigma - Sigma (in mm.) of the gaussian kernel used for in-slice smoothing of the deformation field (voxel shift map, vsm)
-
-
     Outputs::
-
         outputnode.dmri_corrected
         outputnode.bvec_rotated
-
-
     Optional arguments::
-
         use_fieldmap - True if there are fieldmap files that should be used (default True)
         fieldmap_registration - True if registration to fieldmap should be performed (default False)
-
-
     """
 
     warnings.warn(
@@ -142,37 +125,25 @@ def create_motion_correct_pipeline(name='motion_correct'):
     them to one reference image. Finally, the b-matrix is rotated accordingly
     (Leemans et al. 2009 - http://www.ncbi.nlm.nih.gov/pubmed/19319973),
     making use of the rotation matrix obtained by FLIRT.
-
-
     .. deprecated:: 0.9.3
       Use :func:`nipype.workflows.dmri.preprocess.epi.hmc_pipeline` instead.
-
-
     .. warning:: This workflow rotates the b-vectors, so please be adviced
       that not all the dicom converters ensure the consistency between the resulting
       nifti orientation and the b matrix table (e.g. dcm2nii checks it).
-
-
     Example
     -------
-
     >>> nipype_motioncorrect = create_motion_correct_pipeline('nipype_motioncorrect')
     >>> nipype_motioncorrect.inputs.inputnode.in_file = 'diffusion.nii'
     >>> nipype_motioncorrect.inputs.inputnode.in_bvec = 'diffusion.bvec'
     >>> nipype_motioncorrect.inputs.inputnode.ref_num = 0
     >>> nipype_motioncorrect.run() # doctest: +SKIP
-
     Inputs::
-
         inputnode.in_file
         inputnode.ref_num
         inputnode.in_bvec
-
     Outputs::
-
         outputnode.motion_corrected
         outputnode.out_bvec
-
     """
 
     warnings.warn(
@@ -223,31 +194,22 @@ def create_motion_correct_pipeline(name='motion_correct'):
 
 def create_eddy_correct_pipeline(name='eddy_correct'):
     """
-
     .. deprecated:: 0.9.3
       Use :func:`nipype.workflows.dmri.preprocess.epi.ecc_pipeline` instead.
-
-
     Creates a pipeline that replaces eddy_correct script in FSL. It takes a
     series of diffusion weighted images and linearly co-registers them to one
     reference image. No rotation of the B-matrix is performed, so this pipeline
     should be executed after the motion correction pipeline.
-
     Example
     -------
-
     >>> nipype_eddycorrect = create_eddy_correct_pipeline('nipype_eddycorrect')
     >>> nipype_eddycorrect.inputs.inputnode.in_file = 'diffusion.nii'
     >>> nipype_eddycorrect.inputs.inputnode.ref_num = 0
     >>> nipype_eddycorrect.run() # doctest: +SKIP
-
     Inputs::
-
         inputnode.in_file
         inputnode.ref_num
-
     Outputs::
-
         outputnode.eddy_corrected
     """
 
@@ -287,23 +249,16 @@ def create_eddy_correct_pipeline(name='eddy_correct'):
 
 def fieldmap_correction(name='fieldmap_correction', nocheck=False):
     """
-
     .. deprecated:: 0.9.3
       Use :func:`nipype.workflows.dmri.preprocess.epi.sdc_fmb` instead.
-
-
     Fieldmap-based retrospective correction of EPI images for the susceptibility distortion
     artifact (Jezzard et al., 1995). Fieldmap images are assumed to be already registered
     to EPI data, and a brain mask is required.
-
     Replaces the former workflow, still available as create_epidewarp_pipeline().  The difference
     with respect the epidewarp pipeline is that now the workflow uses the new fsl_prepare_fieldmap
     available as of FSL 5.0.
-
-
     Example
     -------
-
     >>> nipype_epicorrect = fieldmap_correction('nipype_epidewarp')
     >>> nipype_epicorrect.inputs.inputnode.in_file = 'diffusion.nii'
     >>> nipype_epicorrect.inputs.inputnode.in_mask = 'brainmask.nii'
@@ -313,9 +268,7 @@ def fieldmap_correction(name='fieldmap_correction', nocheck=False):
     >>> nipype_epicorrect.inputs.inputnode.epi_echospacing = 0.77
     >>> nipype_epicorrect.inputs.inputnode.encoding_direction = 'y'
     >>> nipype_epicorrect.run() # doctest: +SKIP
-
     Inputs::
-
         inputnode.in_file - The volume acquired with EPI sequence
         inputnode.in_mask - A brain mask
         inputnode.fieldmap_pha - The phase difference map from the fieldmapping, registered to in_file
@@ -327,13 +280,9 @@ def fieldmap_correction(name='fieldmap_correction', nocheck=False):
                                     eff_es = es / acc_factor.
         inputnode.encoding_direction - The phase encoding direction in EPI acquisition (default y)
         inputnode.vsm_sigma - Sigma value of the gaussian smoothing filter applied to the vsm (voxel shift map)
-
-
     Outputs::
-
         outputnode.epi_corrected
         outputnode.out_vsm
-
     """
 
     warnings.warn(('This workflow is deprecated from v.1.0.0, use '
@@ -404,11 +353,11 @@ def fieldmap_correction(name='fieldmap_correction', nocheck=False):
                     (('te_diff', _ms2sec), 'asym_se_time'),
                     ('vsm_sigma', 'smooth2d'), (('epi_echospacing', _ms2sec),
                                                 'dwell_time')]),
-         (mask_mag, vsm, [('out_file', 'mask_file')]), (inputnode, dwi_split, [
+         (inputnode, vsm, [('in_mask', 'mask_file')]), (inputnode, dwi_split, [
              ('in_file', 'in_file')
          ]), (dwi_split, dwi_applyxfm,
-              [('out_files', 'in_file')]), (mask_mag, dwi_applyxfm,
-                                            [('out_file', 'mask_file')]),
+              [('out_files', 'in_file')]), (inputnode, dwi_applyxfm,
+                                            [('in_mask', 'mask_file')]),
          (vsm, dwi_applyxfm,
           [('shift_out_file', 'shift_in_file')]), (inputnode, dwi_applyxfm, [
               ('encoding_direction', 'unwarp_direction')
@@ -422,39 +371,25 @@ def fieldmap_correction(name='fieldmap_correction', nocheck=False):
 
 def topup_correction(name='topup_correction'):
     """
-
     .. deprecated:: 0.9.3
       Use :func:`nipype.workflows.dmri.preprocess.epi.sdc_peb` instead.
-
-
     Corrects for susceptibilty distortion of EPI images when one reverse encoding dataset has
     been acquired
-
-
     Example
     -------
-
     >>> nipype_epicorrect = topup_correction('nipype_topup')
     >>> nipype_epicorrect.inputs.inputnode.in_file_dir = 'epi.nii'
     >>> nipype_epicorrect.inputs.inputnode.in_file_rev = 'epi_rev.nii'
     >>> nipype_epicorrect.inputs.inputnode.encoding_direction = ['y', 'y-']
     >>> nipype_epicorrect.inputs.inputnode.ref_num = 0
     >>> nipype_epicorrect.run() # doctest: +SKIP
-
-
     Inputs::
-
         inputnode.in_file_dir - EPI volume acquired in 'forward' phase encoding
         inputnode.in_file_rev - EPI volume acquired in 'reversed' phase encoding
         inputnode.encoding_direction - Direction encoding of in_file_dir
         inputnode.ref_num - Identifier of the reference volumes (usually B0 volume)
-
-
     Outputs::
-
         outputnode.epi_corrected
-
-
     """
 
     warnings.warn(('This workflow is deprecated from v.1.0.0, use '
@@ -515,16 +450,11 @@ def create_epidewarp_pipeline(name='epidewarp', fieldmap_registration=False):
     for susceptibility distortion correction of dMRI & fMRI acquired with EPI sequences and the fieldmap
     information (Jezzard et al., 1995) using FSL's FUGUE. The registration to the (warped) fieldmap
     (strictly following the original script) is available using fieldmap_registration=True.
-
-
     .. warning:: This workflow makes use of ``epidewarp.fsl`` a script of FSL deprecated long
       time ago. The use of this workflow is not recommended, use
       :func:`nipype.workflows.dmri.preprocess.epi.sdc_fmb` instead.
-
-
     Example
     -------
-
     >>> nipype_epicorrect = create_epidewarp_pipeline('nipype_epidewarp', fieldmap_registration=False)
     >>> nipype_epicorrect.inputs.inputnode.in_file = 'diffusion.nii'
     >>> nipype_epicorrect.inputs.inputnode.fieldmap_mag = 'magnitude.nii'
@@ -535,9 +465,7 @@ def create_epidewarp_pipeline(name='epidewarp', fieldmap_registration=False):
     >>> nipype_epicorrect.inputs.inputnode.ref_num = 0
     >>> nipype_epicorrect.inputs.inputnode.pi_accel_factor = 1.0
     >>> nipype_epicorrect.run() # doctest: +SKIP
-
     Inputs::
-
         inputnode.in_file - The volume acquired with EPI sequence
         inputnode.fieldmap_mag - The magnitude of the fieldmap
         inputnode.fieldmap_pha - The phase difference of the fieldmap
@@ -548,17 +476,10 @@ def create_epidewarp_pipeline(name='epidewarp', fieldmap_registration=False):
         inputnode.pi_accel_factor - Acceleration factor used for EPI parallel imaging (GRAPPA)
         inputnode.vsm_sigma - Sigma value of the gaussian smoothing filter applied to the vsm (voxel shift map)
         inputnode.ref_num - The reference volume (B=0 in dMRI or a central frame in fMRI)
-
-
     Outputs::
-
         outputnode.epi_corrected
-
-
     Optional arguments::
-
         fieldmap_registration - True if registration to fieldmap should be done (default False)
-
     """
 
     warnings.warn(('This workflow reproduces a deprecated FSL script.'),
